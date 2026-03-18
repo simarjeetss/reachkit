@@ -1,4 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import { getCampaigns } from "@/lib/supabase/campaigns";
 
 const STAT_CARDS = [
   {
@@ -68,15 +70,15 @@ const NEXT_STEPS = [
     step: "02",
     title: "Campaigns & Contacts",
     desc: "Create campaigns, add contacts manually or via CSV import, and manage your outreach lists.",
-    done: false,
-    tag: "Phase 2 — Next",
+    done: true,
+    tag: "Phase 2 ✓",
   },
   {
     step: "03",
     title: "AI Email Generation",
     desc: "GPT-4 powered email composer with {{first_name}}, {{company}} variables and style learning.",
     done: false,
-    tag: "Phase 3",
+    tag: "Phase 3 — Next",
   },
   {
     step: "04",
@@ -97,6 +99,8 @@ const NEXT_STEPS = [
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const { data: campaigns } = await getCampaigns();
+  const totalContacts = campaigns.reduce((sum, c) => sum + (c.contact_count ?? 0), 0);
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -116,43 +120,65 @@ export default async function DashboardPage() {
 
       {/* Stats grid */}
       <div className="rk-fade-up rk-delay-1 grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {STAT_CARDS.map((card) => (
-          <div
-            key={card.label}
-            className="rounded-xl p-5 flex flex-col gap-3"
-            style={{
-              background: "var(--rk-surface)",
-              border: "1px solid var(--rk-border)",
-            }}
-          >
+        {STAT_CARDS.map((card) => {
+          const value =
+            card.label === "Campaigns" ? String(campaigns.length) :
+            card.label === "Contacts"  ? String(totalContacts) :
+            card.value;
+          const sub =
+            card.label === "Campaigns" && campaigns.length > 0
+              ? `${campaigns.filter((c) => c.status === "active").length} active`
+              : card.label === "Contacts" && totalContacts > 0
+              ? `Across ${campaigns.length} campaign${campaigns.length !== 1 ? "s" : ""}`
+              : card.sub;
+
+          const inner = (
             <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center"
-              style={{ background: card.color, color: card.iconColor }}
+              key={card.label}
+              className="rounded-xl p-5 flex flex-col gap-3 transition-all group"
+              style={{
+                background: "var(--rk-surface)",
+                border: "1px solid var(--rk-border)",
+              }}
             >
-              {card.icon}
-            </div>
-            <div>
               <div
-                className="text-2xl font-semibold mb-0.5"
-                style={{
-                  fontFamily: "var(--font-display)",
-                  color: "var(--rk-text)",
-                }}
+                className="w-9 h-9 rounded-lg flex items-center justify-center"
+                style={{ background: card.color, color: card.iconColor }}
               >
-                {card.value}
+                {card.icon}
               </div>
-              <div
-                className="text-xs font-medium mb-0.5 uppercase tracking-wider"
-                style={{ color: "var(--rk-text-muted)" }}
-              >
-                {card.label}
-              </div>
-              <div className="text-[11px]" style={{ color: "var(--rk-text-sub)" }}>
-                {card.sub}
+              <div>
+                <div
+                  className="text-2xl font-semibold mb-0.5"
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    color: "var(--rk-text)",
+                  }}
+                >
+                  {value}
+                </div>
+                <div
+                  className="text-xs font-medium mb-0.5 uppercase tracking-wider"
+                  style={{ color: "var(--rk-text-muted)" }}
+                >
+                  {card.label}
+                </div>
+                <div className="text-[11px]" style={{ color: "var(--rk-text-sub)" }}>
+                  {sub}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+
+          if (card.label === "Campaigns" || card.label === "Contacts") {
+            return (
+              <Link key={card.label} href="/dashboard/campaigns" className="block">
+                {inner}
+              </Link>
+            );
+          }
+          return <div key={card.label}>{inner}</div>;
+        })}
       </div>
 
       {/* Main 2-col */}
@@ -180,7 +206,7 @@ export default async function DashboardPage() {
                 border: "1px solid rgba(212,168,83,0.2)",
               }}
             >
-              1 / 5
+              2 / 5
             </div>
           </div>
 
@@ -276,7 +302,7 @@ export default async function DashboardPage() {
             </h3>
             {[
               { label: "Auth & Setup", done: true },
-              { label: "Campaigns", done: false },
+              { label: "Campaigns", done: true },
               { label: "AI Generation", done: false },
               { label: "Email Sending", done: false },
               { label: "Analytics", done: false },

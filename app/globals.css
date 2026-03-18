@@ -127,3 +127,134 @@
     @apply font-sans;
   }
 }
+
+/* ─── ReachKit Design System ─────────────────────────────────────────── */
+
+:root {
+  --rk-bg:         #0d0d0f;
+  --rk-surface:    #141416;
+  --rk-surface-2:  #1c1c1f;
+  --rk-border:     rgba(255,255,255,0.07);
+  --rk-border-md:  rgba(255,255,255,0.12);
+  --rk-gold:       #d4a853;
+  --rk-gold-light: #e8c47a;
+  --rk-gold-dim:   rgba(212,168,83,0.15);
+  --rk-text:       #f0ede8;
+  --rk-text-muted: #7a7672;
+  --rk-text-sub:   #4a4845;
+
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body:    "DM Sans", sans-serif;
+}
+
+/* ─── Keyframe Animations ─────────────────────────────────────────────── */
+
+@keyframes rk-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes rk-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes rk-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@keyframes rk-pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212,168,83,0); }
+  50%       { box-shadow: 0 0 20px 4px rgba(212,168,83,0.18); }
+}
+
+.rk-fade-up   { animation: rk-fade-up  0.55s cubic-bezier(0.22,1,0.36,1) both; }
+.rk-fade-in   { animation: rk-fade-in  0.4s ease both; }
+.rk-delay-1   { animation-delay: 0.08s; }
+.rk-delay-2   { animation-delay: 0.16s; }
+.rk-delay-3   { animation-delay: 0.24s; }
+.rk-delay-4   { animation-delay: 0.32s; }
+.rk-delay-5   { animation-delay: 0.40s; }
+
+/* ─── Auth Form Styles ────────────────────────────────────────────────── */
+
+.rk-auth-input {
+  background: var(--rk-surface-2);
+  border: 1px solid var(--rk-border-md);
+  color: var(--rk-text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  border-radius: 0.5rem;
+  padding: 0.7rem 1rem;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rk-auth-input::placeholder { color: var(--rk-text-sub); }
+
+.rk-auth-input:focus {
+  border-color: var(--rk-gold);
+  box-shadow: 0 0 0 3px rgba(212,168,83,0.12);
+}
+
+.rk-btn-gold {
+  background: var(--rk-gold);
+  color: #0d0d0f;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  animation: rk-pulse-glow 3s ease-in-out infinite;
+}
+
+.rk-btn-gold:hover {
+  background: var(--rk-gold-light);
+  transform: translateY(-1px);
+}
+
+.rk-btn-gold:active { transform: translateY(0); }
+
+.rk-btn-ghost {
+  background: transparent;
+  color: var(--rk-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  border: 1px solid var(--rk-border);
+  border-radius: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+  width: 100%;
+}
+
+.rk-btn-ghost:hover {
+  border-color: var(--rk-border-md);
+  color: var(--rk-text);
+}
+
+/* ─── Noise texture overlay ───────────────────────────────────────────── */
+
+.rk-noise::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ─── Scrollbar ───────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--rk-bg); }
+::-webkit-scrollbar-thumb { background: var(--rk-surface-2); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--rk-text-sub); }

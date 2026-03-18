@@ -1,54 +1,115 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white dark:bg-black">
-      <main className="flex flex-col items-center justify-center px-6 py-24 text-center">
-        {/* Logo/Brand */}
-        <div className="mb-8">
-          <h1 className="text-5xl font-bold tracking-tight text-black dark:text-white sm:text-6xl">
-            ReachKit<span className="text-blue-600">.ai</span>
+    <div
+      className="flex min-h-screen items-center justify-center relative overflow-hidden"
+      style={{ background: "var(--rk-bg)" }}
+    >
+      {/* Ambient glow */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: "20%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "600px",
+          height: "400px",
+          background:
+            "radial-gradient(ellipse, rgba(212,168,83,0.06) 0%, transparent 70%)",
+        }}
+      />
+
+      {/* Grid */}
+      <div
+        className="absolute inset-0 opacity-[0.025] pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(var(--rk-gold) 1px, transparent 1px), linear-gradient(90deg, var(--rk-gold) 1px, transparent 1px)",
+          backgroundSize: "80px 80px",
+        }}
+      />
+
+      <main className="relative z-10 flex flex-col items-center px-6 py-24 text-center">
+        {/* Brand */}
+        <div className="rk-fade-up mb-6">
+          <h1
+            className="text-5xl font-medium tracking-tight sm:text-6xl"
+            style={{ fontFamily: "var(--font-display)", color: "var(--rk-text)" }}
+          >
+            ReachKit<span style={{ color: "var(--rk-gold)" }}>.ai</span>
           </h1>
         </div>
 
         {/* Tagline */}
-        <p className="mb-4 max-w-2xl text-xl text-zinc-600 dark:text-zinc-400 sm:text-2xl">
+        <p
+          className="rk-fade-up rk-delay-1 mb-3 max-w-2xl text-xl sm:text-2xl"
+          style={{ color: "var(--rk-text-muted)", fontStyle: "italic", fontFamily: "var(--font-display)" }}
+        >
           AI-powered cold email outreach that learns from you
         </p>
 
         {/* Description */}
-        <p className="mb-12 max-w-xl text-base text-zinc-500 dark:text-zinc-500">
-          Create personalized campaigns, generate AI-written emails, and automate follow-ups with intelligent tracking and analytics.
+        <p
+          className="rk-fade-up rk-delay-2 mb-12 max-w-lg text-sm leading-relaxed"
+          style={{ color: "var(--rk-text-sub)" }}
+        >
+          Create personalized campaigns, generate AI-written emails, and automate
+          follow-ups with intelligent tracking and analytics.
         </p>
 
-        {/* Features Grid */}
-        <div className="mb-16 grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3">
-          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900">
-            <h3 className="mb-1 font-semibold text-black dark:text-white">AI Email Generation</h3>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              GPT-4 powered personalized emails that match your style
-            </p>
-          </div>
-
-          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900">
-            <h3 className="mb-1 font-semibold text-black dark:text-white">Smart Follow-ups</h3>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Automatic follow-ups based on engagement tracking
-            </p>
-          </div>
-
-          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900">
-            <h3 className="mb-1 font-semibold text-black dark:text-white">Analytics & Insights</h3>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Track opens, clicks, and campaign performance
-            </p>
-          </div>
+        {/* Features */}
+        <div className="rk-fade-up rk-delay-3 mb-12 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
+          {[
+            { title: "AI Email Generation", desc: "GPT-4 powered emails that match your voice" },
+            { title: "Smart Follow-ups", desc: "Automatic follow-ups based on engagement" },
+            { title: "Analytics & Insights", desc: "Track opens, clicks, and performance" },
+          ].map((f) => (
+            <div
+              key={f.title}
+              className="rounded-xl p-5 text-left"
+              style={{
+                background: "var(--rk-surface)",
+                border: "1px solid var(--rk-border)",
+              }}
+            >
+              <div
+                className="w-1 h-5 rounded-full mb-3"
+                style={{ background: "var(--rk-gold)" }}
+              />
+              <h3
+                className="font-medium mb-1 text-sm"
+                style={{ color: "var(--rk-text)" }}
+              >
+                {f.title}
+              </h3>
+              <p className="text-xs leading-relaxed" style={{ color: "var(--rk-text-muted)" }}>
+                {f.desc}
+              </p>
+            </div>
+          ))}
         </div>
 
-        {/* CTA Button */}
-        <div className="flex flex-col gap-4 sm:flex-row">
-          <p className="rounded-lg bg-black px-8 py-3 font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200">
-            In Progress...
-          </p>
+        {/* CTAs */}
+        <div className="rk-fade-up rk-delay-4 flex flex-col gap-3 sm:flex-row">
+          <Link href="/signup">
+            <button className="rk-btn-gold" style={{ width: "auto", padding: "0.75rem 2.5rem" }}>
+              Get Started Free
+            </button>
+          </Link>
+          <Link href="/login">
+            <button className="rk-btn-ghost" style={{ width: "auto", padding: "0.73rem 2.5rem" }}>
+              Sign In
+            </button>
+          </Link>
         </div>
+
+        <p
+          className="rk-fade-up rk-delay-5 mt-8 text-xs"
+          style={{ color: "var(--rk-text-sub)" }}
+        >
+          In active development · Phase 1 complete
+        </p>
       </main>
     </div>
   );

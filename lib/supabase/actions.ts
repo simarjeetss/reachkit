@@ -30,14 +30,23 @@ export async function signup(formData: FormData) {
     password: formData.get("password") as string,
   };
 
-  const { error } = await supabase.auth.signUp(data);
+  const { data: signUpData, error } = await supabase.auth.signUp(data);
 
   if (error) {
     return { error: error.message };
   }
 
-  revalidatePath("/", "layout");
-  redirect("/dashboard");
+  // If email confirmation is required the session will be null —
+  // return cleanly so the UI can show the "Check your inbox" success state.
+  // If confirmation is disabled and the user is immediately active, redirect.
+  const session = signUpData?.session;
+  if (session) {
+    revalidatePath("/", "layout");
+    redirect("/dashboard");
+  }
+
+  // No session → confirmation email sent, let the client handle success UI
+  return undefined;
 }
 
 export async function signout() {

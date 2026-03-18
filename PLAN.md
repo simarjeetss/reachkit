@@ -4,8 +4,9 @@
 ## Technology Stack
 
 ### Core Technologies
-- **Frontend/Backend**: Next.js 15 (App Router) + TypeScript
-- **Database**: PostgreSQL (Supabase for quick setup)
+- **Frontend**: Next.js 15 (App Router) + TypeScript
+- **Backend (App Logic + Realtime)**: Convex
+- **Database (Durable Events + Analytics)**: PostgreSQL (Supabase for quick setup)
 - **Auth**: Supabase Auth (built-in)
 - **AI**: OpenAI API (GPT-4)
 - **Email**: Resend (simple API, generous free tier)
@@ -23,12 +24,12 @@
 
 ---
 
-## Simplified Architecture
+## Simplified Architecture (Hybrid)
 
 ```
 User Interface (Next.js)
     ↓
-API Routes
+Convex (queries/mutations/actions + realtime)
     ↓
 ┌─────────┬──────────┬─────────┐
 │         │          │         │
@@ -38,12 +39,10 @@ Supabase  OpenAI    Resend
 
 ---
 
-## Database Schema (Minimal)
+## Data Model (Hybrid, Minimal)
 
 ```sql
--- Just 4 core tables
-
-users (handled by Supabase Auth)
+-- Core entities (Convex)
 
 campaigns
 - id, user_id, name, status, created_at
@@ -53,6 +52,10 @@ contacts
 
 emails
 - id, campaign_id, subject, body_template, send_delay_hours
+
+-- Durable event history + analytics (Supabase/Postgres)
+
+users (handled by Supabase Auth)
 
 sent_emails
 - id, email_id, contact_id, sent_at, opened_at, clicked_at

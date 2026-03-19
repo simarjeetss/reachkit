@@ -1,4 +1,5 @@
 import { getCampaign, getContacts } from "@/lib/supabase/campaigns";
+import { getEmailTemplate } from "@/lib/supabase/email-templates";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import AddContactForm from "@/components/campaigns/add-contact-form";
@@ -6,6 +7,7 @@ import ContactsTable from "@/components/campaigns/contacts-table";
 import CsvImportButton from "@/components/campaigns/csv-import-button";
 import CampaignStatusSelect from "@/components/campaigns/campaign-status-select";
 import DeleteCampaignButton from "@/components/campaigns/delete-campaign-button";
+import EmailComposer from "@/components/campaigns/email-composer";
 
 const STATUS_STYLES: Record<string, { bg: string; color: string; border: string }> = {
   draft:     { bg: "rgba(255,255,255,0.04)", color: "var(--rk-text-muted)", border: "rgba(255,255,255,0.1)" },
@@ -20,8 +22,11 @@ export default async function CampaignDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [{ data: campaign, error: cError }, { data: contacts, error: ctError }] =
-    await Promise.all([getCampaign(id), getContacts(id)]);
+  const [
+    { data: campaign, error: cError },
+    { data: contacts, error: ctError },
+    { data: initialTemplate },
+  ] = await Promise.all([getCampaign(id), getContacts(id), getEmailTemplate(id)]);
 
   if (cError || !campaign) notFound();
 
@@ -142,6 +147,35 @@ export default async function CampaignDetailPage({
           </h2>
           <AddContactForm campaignId={id} />
         </div>
+      </div>
+
+      {/* Email Template */}
+      <div className="rk-fade-up rk-delay-3 mt-8">
+        <div className="flex items-center gap-3 mb-4">
+          <h2
+            className="text-base font-semibold"
+            style={{ fontFamily: "var(--font-display)", color: "var(--rk-text)" }}
+          >
+            Email Template
+          </h2>
+          <span
+            className="text-[10px] px-2 py-0.5 rounded font-medium"
+            style={{
+              background: "rgba(212,168,83,0.08)",
+              border: "1px solid rgba(212,168,83,0.2)",
+              color: "var(--rk-gold)",
+            }}
+          >
+            AI-powered
+          </span>
+        </div>
+        <EmailComposer
+          campaignId={id}
+          campaignName={campaign.name}
+          campaignDescription={campaign.description}
+          initialTemplate={initialTemplate}
+          previewContacts={contacts}
+        />
       </div>
     </div>
   );

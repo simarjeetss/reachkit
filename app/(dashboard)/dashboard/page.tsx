@@ -76,16 +76,16 @@ const NEXT_STEPS = [
   {
     step: "03",
     title: "AI Email Generation",
-    desc: "GPT-4 powered email composer with {{first_name}}, {{company}} variables and style learning.",
-    done: false,
-    tag: "Phase 3 — Next",
+    desc: "AI-powered email composer with {{first_name}}, {{company}} variables, live preview, and one-click generation.",
+    done: true,
+    tag: "Phase 3 ✓",
   },
   {
     step: "04",
     title: "Email Sending & Tracking",
     desc: "Send via Resend, track opens with pixels, track clicks — all stored back to Supabase.",
     done: false,
-    tag: "Phase 4",
+    tag: "Phase 4 — Next",
   },
   {
     step: "05",
@@ -206,7 +206,7 @@ export default async function DashboardPage() {
                 border: "1px solid rgba(212,168,83,0.2)",
               }}
             >
-              2 / 5
+              3 / 5
             </div>
           </div>
 
@@ -303,7 +303,7 @@ export default async function DashboardPage() {
             {[
               { label: "Auth & Setup", done: true },
               { label: "Campaigns", done: true },
-              { label: "AI Generation", done: false },
+              { label: "AI Generation", done: true },
               { label: "Email Sending", done: false },
               { label: "Analytics", done: false },
             ].map((item) => (
@@ -363,7 +363,7 @@ export default async function DashboardPage() {
               Tech Stack
             </h3>
             <div className="flex flex-wrap gap-2">
-              {["Next.js 16", "Supabase", "OpenAI", "Resend", "Tailwind", "shadcn/ui"].map(
+              {["Next.js 16", "Supabase", "Gemini AI", "Resend", "Tailwind", "shadcn/ui"].map(
                 (tech) => (
                   <span
                     key={tech}

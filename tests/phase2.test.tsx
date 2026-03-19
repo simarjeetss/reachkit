@@ -17,6 +17,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
+import type { Contact } from "@/lib/supabase/campaigns";
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
@@ -447,6 +448,7 @@ function makeContacts(n: number, overrides: Partial<Contact> = {}): Contact[] {
   return Array.from({ length: n }, (_, i) => ({
     id: `cont-${i + 1}`,
     campaign_id: "camp-123",
+    user_id: "user-1",
     email: `user${i + 1}@example.com`,
     first_name: `First${i + 1}`,
     last_name: `Last${i + 1}`,

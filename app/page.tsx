@@ -36,12 +36,14 @@ export default function Home() {
         className="flex items-center justify-between px-6 sm:px-12 lg:px-20 h-16"
         style={{ borderBottom: "1px solid var(--rk-border)" }}
       >
-        <span
-          className="text-xl font-bold tracking-tight"
-          style={{ fontFamily: "var(--font-display)", color: "var(--rk-text)" }}
-        >
-          ReachKit<span style={{ color: "var(--rk-gold)" }}>.ai</span>
-        </span>
+        <Link href="/">
+          <span
+            className="text-xl font-bold tracking-tight cursor-pointer"
+            style={{ fontFamily: "var(--font-display)", color: "var(--rk-text)" }}
+          >
+            ReachKit<span style={{ color: "var(--rk-gold)" }}>.ai</span>
+          </span>
+        </Link>
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-5 mr-3">
             <Link

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function AuthLayout({
   children,
 }: {
@@ -49,12 +51,14 @@ export default function AuthLayout({
 
         {/* Logo — always light text on dark bg */}
         <div className="rk-fade-up relative z-10">
-          <span
-            className="text-2xl font-bold tracking-tight"
-            style={{ fontFamily: "var(--font-display)", color: "#f0ede8" }}
-          >
-            ReachKit<span style={{ color: "#d4a853" }}>.ai</span>
-          </span>
+          <Link href="/">
+            <span
+              className="text-2xl font-bold tracking-tight cursor-pointer"
+              style={{ fontFamily: "var(--font-display)", color: "#f0ede8" }}
+            >
+              ReachKit<span style={{ color: "#d4a853" }}>.ai</span>
+            </span>
+          </Link>
         </div>
 
         {/* Central quote */}
@@ -114,12 +118,14 @@ export default function AuthLayout({
       >
         {/* Mobile logo */}
         <div className="lg:hidden mb-10 rk-fade-in">
-          <span
-            className="text-2xl font-bold"
-            style={{ fontFamily: "var(--font-display)", color: "var(--rk-text)" }}
-          >
-            ReachKit<span style={{ color: "var(--rk-gold)" }}>.ai</span>
-          </span>
+          <Link href="/">
+            <span
+              className="text-2xl font-bold cursor-pointer"
+              style={{ fontFamily: "var(--font-display)", color: "var(--rk-text)" }}
+            >
+              ReachKit<span style={{ color: "var(--rk-gold)" }}>.ai</span>
+            </span>
+          </Link>
         </div>
 
         {/* Form card with a subtle lift on light mode */}

@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import type { User } from "@supabase/supabase-js";
 import { signout } from "@/lib/supabase/actions";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function DashboardTopbar({ user }: { user: User }) {
   const [isPending, startTransition] = useTransition();
@@ -58,6 +59,9 @@ export default function DashboardTopbar({ user }: { user: User }) {
           />
           Active
         </div>
+
+        {/* Theme toggle */}
+        <ThemeToggle />
 
         {/* Avatar */}
         <div

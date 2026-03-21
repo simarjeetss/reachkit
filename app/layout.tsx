@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+  <html lang="en" className="light" data-theme="light" suppressHydrationWarning>
       <head>
         {/* Inline script to set theme class before paint — prevents flash */}
         <script

@@ -8,6 +8,7 @@ import {
 } from "@/lib/analytics/metrics";
 import EngagementChart from "@/components/analytics/engagement-chart";
 import AnalyticsFilters from "@/components/analytics/analytics-filters";
+import AnalyticsRangeSelector from "@/components/analytics/analytics-range-selector";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,12 +23,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-const RANGE_OPTIONS = [
-  { label: "7D", value: 7 },
-  { label: "30D", value: 30 },
-  { label: "90D", value: 90 },
-];
 
 const KPI_DESCRIPTIONS: Record<string, string> = {
   sent: "Total emails sent in the selected window.",
@@ -49,13 +44,6 @@ function formatDate(value: string | null) {
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(value));
-}
-
-function buildAnalyticsUrl(campaignId: string | null, range: number) {
-  const params = new URLSearchParams();
-  if (campaignId) params.set("campaign", campaignId);
-  if (range) params.set("range", String(range));
-  return `/dashboard/analytics?${params.toString()}`;
 }
 
 export default async function AnalyticsPage({
@@ -141,21 +129,10 @@ export default async function AnalyticsPage({
             Track sends, opens, and clicks by campaign.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {RANGE_OPTIONS.map((option) => (
-            <Link
-              key={option.value}
-              href={buildAnalyticsUrl(selectedCampaignId, option.value)}
-            >
-              <Button
-                size="sm"
-                variant={rangeDays === option.value ? "default" : "outline"}
-              >
-                {option.label}
-              </Button>
-            </Link>
-          ))}
-        </div>
+        <AnalyticsRangeSelector
+          rangeDays={rangeDays}
+          selectedCampaignId={selectedCampaignId}
+        />
       </div>
 
       {error && (

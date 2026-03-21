@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useRef, useEffect, useCallback } from "react";
 import { createTemplate } from "@/lib/supabase/email-templates";
+import { sendCampaignNow } from "@/lib/supabase/sent-emails";
 import { generateEmailWithAI } from "@/lib/ai/generate-email";
 import { polishEmailWithAI } from "@/lib/ai/polish-email";
 import type { EmailTemplate } from "@/lib/supabase/email-templates";
@@ -67,6 +68,7 @@ export default function EmailComposer({
   const [aiError,      setAiError]     = useState("");
   const [isSaving,     startSave]      = useTransition();
   const [isGenerating, startGenerate]  = useTransition();
+  const [isSending,    startSend]      = useTransition();
   const [profile,      setProfile]     = useState<UserProfile | null>(initialProfile);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
 
@@ -75,6 +77,12 @@ export default function EmailComposer({
   const [templateName,    setTemplateName]    = useState("");
   const [saveModalError,  setSaveModalError]  = useState("");
   const templateNameRef = useRef<HTMLInputElement>(null);
+
+  // Send-now modal state
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [sendError, setSendError] = useState("");
+  const [sendStatus, setSendStatus] = useState<"idle" | "sent" | "error">("idle");
+  const [sendSummary, setSendSummary] = useState<{ sent: number; failed: number } | null>(null);
 
   // Focus name input when modal opens
   useEffect(() => {
@@ -136,10 +144,51 @@ export default function EmailComposer({
     });
   }
 
+  function handleSendClick() {
+    setSendStatus("idle");
+    setSendSummary(null);
+    setSendError("");
+
+    if (!subject.trim() || !body.trim()) {
+      setSendStatus("error");
+      setSendError(!subject.trim() ? "Subject is required before sending." : "Body is required before sending.");
+      return;
+    }
+    if (previewContacts.length === 0) {
+      setSendStatus("error");
+      setSendError("Add at least one contact before sending.");
+      return;
+    }
+    if (profileMissing) {
+      setSendStatus("error");
+      setSendError("Set your sender profile before sending.");
+      return;
+    }
+
+    setShowSendModal(true);
+  }
+
+  function handleConfirmSend() {
+    setSendError("");
+    startSend(async () => {
+      const result = await sendCampaignNow(campaignId, subject, body);
+      if (result.error) {
+        setSendStatus("error");
+        setSendError(result.error);
+        return;
+      }
+      setSendStatus("sent");
+      setSendSummary({ sent: result.sent, failed: result.failed });
+      setShowSendModal(false);
+    });
+  }
+
   function handleLoadTemplate(newSubject: string, newBody: string) {
     setSubject(newSubject);
     setBody(newBody);
     setSaveStatus("idle");
+    setSendStatus("idle");
+    setSendError("");
     setTab("compose");
     // Brief flash so the user sees the content loaded
     setTimeout(() => bodyRef.current?.focus(), 80);
@@ -161,6 +210,7 @@ export default function EmailComposer({
       setSubject(result.subject);
       setBody(result.body);
       setSaveStatus("idle");
+      setSendStatus("idle");
     });
   }
 
@@ -324,6 +374,83 @@ export default function EmailComposer({
         </div>
       )}
 
+      {showSendModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowSendModal(false); }}
+        >
+          <div
+            className="rk-fade-up w-full max-w-sm mx-4 rounded-2xl p-5 flex flex-col gap-4"
+            style={{
+              background: "var(--rk-surface, #141417)",
+              border: "1px solid rgba(212,168,83,0.25)",
+              boxShadow: "0 24px 64px rgba(0,0,0,0.7)",
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--rk-gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 2 11 13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+              <span className="text-sm font-semibold" style={{ color: "var(--rk-text)", fontFamily: "var(--font-display, serif)" }}>
+                Send campaign now
+              </span>
+            </div>
+
+            <div className="text-xs" style={{ color: "var(--rk-text-muted)" }}>
+              This will send to <strong style={{ color: "var(--rk-text)" }}>{previewContacts.length}</strong> contact{previewContacts.length === 1 ? "" : "s"}.
+            </div>
+
+            <div
+              className="px-3 py-2.5 rounded-xl text-xs space-y-1"
+              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--rk-border)" }}
+            >
+              <div className="truncate" style={{ color: "var(--rk-text-muted)" }}>
+                <span style={{ color: "var(--rk-text-sub)" }}>Subject: </span>{subject || <em style={{ opacity: 0.5 }}>empty</em>}
+              </div>
+              <div className="line-clamp-2 leading-relaxed" style={{ color: "var(--rk-text-sub)" }}>
+                {body.slice(0, 100)}{body.length > 100 ? "…" : ""}
+              </div>
+            </div>
+
+            {sendError && (
+              <div
+                className="px-3 py-2 rounded-lg text-xs"
+                style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171" }}
+              >
+                {sendError}
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 justify-end">
+              <button
+                onClick={() => setShowSendModal(false)}
+                className="px-3 py-2 rounded-xl text-xs font-medium transition-all"
+                style={{ background: "transparent", border: "1px solid var(--rk-border)", color: "var(--rk-text-muted)", cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmSend}
+                aria-label="Confirm send now"
+                disabled={isSending}
+                className="px-4 py-2 rounded-xl text-xs font-semibold transition-all"
+                style={{
+                  background: isSending ? "rgba(212,168,83,0.4)" : "var(--rk-gold)",
+                  color: "#0d0d0f",
+                  border: "none",
+                  cursor: isSending ? "not-allowed" : "pointer",
+                  opacity: isSending ? 0.7 : 1,
+                }}
+              >
+                {isSending ? "Sending…" : "Send now"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Sender context bar ──────────────────────────────────────────── */}
       <div
         className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl flex-wrap"
@@ -447,6 +574,22 @@ export default function EmailComposer({
             )}
           </button>
 
+          {/* Send Now */}
+          <button
+            onClick={handleSendClick}
+            disabled={isSending || isGenerating}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+            style={{
+              background: "rgba(212, 168, 83, 0.1)",
+              border: "1px solid rgba(212, 168, 83, 0.3)",
+              color: "var(--rk-gold)",
+              cursor: isSending ? "not-allowed" : "pointer",
+              opacity: isSending ? 0.6 : 1,
+            }}
+          >
+            {isSending ? "Sending…" : "Send now"}
+          </button>
+
           {/* Save */}
           <button
             onClick={handleSave}
@@ -494,6 +637,26 @@ export default function EmailComposer({
         </div>
       )}
 
+      {sendStatus === "sent" && (
+        <div
+          className="rk-fade-in px-4 py-2.5 rounded-lg text-xs flex items-center gap-2"
+          style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)", color: "#4ade80" }}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+          {sendSummary
+            ? `Sent ${sendSummary.sent} emails${sendSummary.failed ? `, ${sendSummary.failed} failed` : ""}`
+            : "Emails sent"}
+        </div>
+      )}
+      {sendStatus === "error" && sendError && (
+        <div
+          className="rk-fade-in px-4 py-2.5 rounded-lg text-xs"
+          style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171" }}
+        >
+          {sendError}
+        </div>
+      )}
+
       {/* ── COMPOSE tab ─────────────────────────────────────────────────── */}
       {tab === "compose" && (
         <div
@@ -509,7 +672,7 @@ export default function EmailComposer({
               <input
                 type="text"
                 value={subject}
-                onChange={(e) => { setSubject(e.target.value); setSaveStatus("idle"); }}
+                onChange={(e) => { setSubject(e.target.value); setSaveStatus("idle"); setSendStatus("idle"); }}
                 placeholder="Your subject line…"
                 className="flex-1 bg-transparent text-sm outline-none"
                 style={{ color: "var(--rk-text)", caretColor: "var(--rk-gold)" }}
@@ -529,7 +692,7 @@ export default function EmailComposer({
             <textarea
               ref={bodyRef}
               value={body}
-              onChange={(e) => { setBody(e.target.value); setSaveStatus("idle"); }}
+              onChange={(e) => { setBody(e.target.value); setSaveStatus("idle"); setSendStatus("idle"); }}
               onKeyDown={handleBodyKeyDown}
               placeholder={"Write your email body here, or press / to write with AI…"}
               rows={14}

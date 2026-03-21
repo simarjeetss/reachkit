@@ -1,16 +1,8 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-
-export const FREE_AI_LIMIT = 15;
-
-export interface AiUsageResult {
-  /** Current count AFTER this call (if allowed) */
-  count: number;
-  /** true when the user has exceeded their free-tier limit */
-  limitExceeded: boolean;
-  error?: string;
-}
+import { FREE_AI_LIMIT } from "@/lib/supabase/ai-usage-config";
+import type { AiUsageResult } from "@/lib/supabase/ai-usage-config";
 
 /**
  * checkAndIncrementAiUsage

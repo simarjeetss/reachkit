@@ -1,7 +1,8 @@
 "use server";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { checkAndIncrementAiUsage, FREE_AI_LIMIT } from "@/lib/supabase/ai-usage";
+import { checkAndIncrementAiUsage } from "@/lib/supabase/ai-usage";
+import { FREE_AI_LIMIT } from "@/lib/supabase/ai-usage-config";
 
 export interface PolishEmailInput {
   userInput: string;

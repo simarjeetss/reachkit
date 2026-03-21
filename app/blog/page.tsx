@@ -228,19 +228,7 @@ export default function BlogPage() {
             {rest.map((post, i) => (
               <Link key={post.slug} href={`/blog/${post.slug}`} className="group block">
                 <article
-                  className="h-full flex flex-col rounded-xl p-6 transition-all duration-200 group-hover:border-rk-gold-dim"
-                  style={{
-                    background: "var(--rk-surface)",
-                    border: "1px solid var(--rk-border)",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(212,168,83,0.25)";
-                    (e.currentTarget as HTMLElement).style.background = "var(--rk-surface-2)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "var(--rk-border)";
-                    (e.currentTarget as HTMLElement).style.background = "var(--rk-surface)";
-                  }}
+                  className="rk-blog-card h-full flex flex-col rounded-xl p-6"
                 >
                   {/* Category + read time */}
                   <div className="flex items-center justify-between mb-4">

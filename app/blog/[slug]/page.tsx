@@ -241,14 +241,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 return (
                   <Link key={s.slug} href={`/blog/${s.slug}`} className="group block">
                     <article
-                      className="h-full rounded-xl p-5 flex flex-col transition-all"
-                      style={{ background: "var(--rk-surface)", border: "1px solid var(--rk-border)" }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.borderColor = "rgba(212,168,83,0.25)";
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.borderColor = "var(--rk-border)";
-                      }}
+                      className="rk-blog-card h-full rounded-xl p-5 flex flex-col"
                     >
                       <span
                         className="inline-block text-xs font-medium px-2 py-0.5 rounded-full mb-3"

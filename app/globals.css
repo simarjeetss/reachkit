@@ -289,6 +289,113 @@
   opacity: 0.04;
 }
 
+/* ─── Blog Prose ─────────────────────────────────────────────────────── */
+
+.rk-prose {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--rk-text-muted);
+  max-width: 68ch;
+}
+
+.rk-prose p {
+  margin-bottom: 1.5rem;
+}
+
+.rk-prose h2 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--rk-text);
+  margin-top: 2.8rem;
+  margin-bottom: 0.9rem;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.rk-prose h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--rk-text);
+  margin-top: 2rem;
+  margin-bottom: 0.6rem;
+}
+
+.rk-prose strong {
+  color: var(--rk-text);
+  font-weight: 600;
+}
+
+.rk-prose em {
+  color: var(--rk-gold);
+  font-style: italic;
+}
+
+.rk-prose code {
+  background: var(--rk-surface-2);
+  border: 1px solid var(--rk-border);
+  border-radius: 0.3rem;
+  padding: 0.1em 0.45em;
+  font-size: 0.85em;
+  font-family: var(--font-mono);
+  color: var(--rk-gold-light);
+}
+
+.rk-prose ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1.5rem;
+}
+
+.rk-prose ul li {
+  padding-left: 1.4em;
+  position: relative;
+  margin-bottom: 0.55rem;
+}
+
+.rk-prose ul li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--rk-gold);
+  opacity: 0.6;
+}
+
+.rk-prose ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.rk-prose ol li {
+  margin-bottom: 0.55rem;
+  padding-left: 0.3em;
+}
+
+.rk-prose a {
+  color: var(--rk-gold);
+  text-decoration: underline;
+  text-decoration-color: rgba(212,168,83,0.35);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.rk-prose a:hover {
+  text-decoration-color: var(--rk-gold);
+}
+
+.rk-prose blockquote {
+  border-left: 2px solid var(--rk-gold);
+  padding: 0.8rem 1.2rem;
+  margin: 2rem 0;
+  background: var(--rk-gold-dim);
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-style: italic;
+  color: var(--rk-text);
+}
+
 /* ─── Scrollbar ───────────────────────────────────────────────────────── */
 
 ::-webkit-scrollbar { width: 5px; }

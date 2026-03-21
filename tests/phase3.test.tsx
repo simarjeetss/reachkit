@@ -3,8 +3,8 @@
  *
  * Suites:
  *  1. generateEmailWithAI — mock-call assertions
- *  2. getEmailTemplate    — returns null, returns data, returns error
- *  3. saveEmailTemplate   — validates, upserts, error on DB failure
+ *  2. getAllTemplates      — returns empty, returns data, returns error
+ *  3. createTemplate      — validates, inserts, error on DB failure
  *  4. EmailComposer UI    — renders, AI generate, save, variable chips, preview tab
  */
 
@@ -40,29 +40,33 @@ vi.mock("@/lib/supabase/server", () => ({
 
 // Mock the server actions used by EmailComposer
 const mockGenerateEmailWithAI = vi.fn();
-const mockSaveEmailTemplate   = vi.fn();
-const mockGetEmailTemplate    = vi.fn();
+const mockCreateTemplate      = vi.fn();
+const mockGetAllTemplates     = vi.fn();
+const mockPolishEmailWithAI   = vi.fn();
 
 vi.mock("@/lib/ai/generate-email", () => ({
   generateEmailWithAI: (...args: unknown[]) => mockGenerateEmailWithAI(...args),
 }));
+vi.mock("@/lib/ai/polish-email", () => ({
+  polishEmailWithAI: (...args: unknown[]) => mockPolishEmailWithAI(...args),
+}));
 vi.mock("@/lib/supabase/email-templates", () => ({
-  saveEmailTemplate: (...args: unknown[]) => mockSaveEmailTemplate(...args),
-  getEmailTemplate:  (...args: unknown[]) => mockGetEmailTemplate(...args),
+  createTemplate:  (...args: unknown[]) => mockCreateTemplate(...args),
+  getAllTemplates:  (...args: unknown[]) => mockGetAllTemplates(...args),
 }));
 
 // ─── Static imports (after mocks) ─────────────────────────────────────────────
 
 import EmailComposer from "@/components/campaigns/email-composer";
 import { generateEmailWithAI } from "@/lib/ai/generate-email";
-import { saveEmailTemplate, getEmailTemplate } from "@/lib/supabase/email-templates";
+import { createTemplate, getAllTemplates } from "@/lib/supabase/email-templates";
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
 function makeTemplate(overrides: Partial<EmailTemplate> = {}): EmailTemplate {
   return {
     id:          "tmpl-1",
-    campaign_id: "camp-1",
+    name:        "My Template",
     user_id:     "user-1",
     subject:     "Hello {{first_name}}",
     body:        "Hi {{first_name}}, welcome to {{company}}.",
@@ -88,6 +92,7 @@ function makeContacts(n: number): Contact[] {
 function renderComposer(opts: {
   template?: EmailTemplate | null;
   contacts?: Contact[];
+  profile?: import("@/lib/supabase/profile").UserProfile | null;
 } = {}) {
   render(
     <EmailComposer
@@ -96,6 +101,7 @@ function renderComposer(opts: {
       campaignDescription="Our annual sale."
       initialTemplate={opts.template ?? null}
       previewContacts={opts.contacts ?? makeContacts(2)}
+      initialProfile={opts.profile ?? null}
     />
   );
 }
@@ -142,64 +148,64 @@ describe("generateEmailWithAI", () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Suite 2 — getEmailTemplate
+// Suite 2 — getAllTemplates
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("getEmailTemplate", () => {
+describe("getAllTemplates", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("returns null data when no template exists", async () => {
-    mockGetEmailTemplate.mockResolvedValueOnce({ data: null, error: null });
-    const result = await getEmailTemplate("camp-999");
-    expect(result.data).toBeNull();
+  it("returns empty array when no templates exist", async () => {
+    mockGetAllTemplates.mockResolvedValueOnce({ data: [], error: null });
+    const result = await getAllTemplates();
+    expect(result.data).toEqual([]);
     expect(result.error).toBeNull();
   });
 
-  it("returns template data when one exists", async () => {
+  it("returns template data when templates exist", async () => {
     const tmpl = makeTemplate();
-    mockGetEmailTemplate.mockResolvedValueOnce({ data: tmpl, error: null });
-    const result = await getEmailTemplate("camp-1");
-    expect(result.data?.subject).toBe(tmpl.subject);
-    expect(result.data?.body).toBe(tmpl.body);
+    mockGetAllTemplates.mockResolvedValueOnce({ data: [tmpl], error: null });
+    const result = await getAllTemplates();
+    expect(result.data?.[0]?.subject).toBe(tmpl.subject);
+    expect(result.data?.[0]?.body).toBe(tmpl.body);
   });
 
   it("returns error string on DB failure", async () => {
-    mockGetEmailTemplate.mockResolvedValueOnce({ data: null, error: "Connection refused" });
-    const result = await getEmailTemplate("camp-1");
+    mockGetAllTemplates.mockResolvedValueOnce({ data: [], error: "Connection refused" });
+    const result = await getAllTemplates();
     expect(result.error).toBe("Connection refused");
   });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Suite 3 — saveEmailTemplate
+// Suite 3 — createTemplate
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("saveEmailTemplate", () => {
+describe("createTemplate", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("returns error when subject is empty", async () => {
-    mockSaveEmailTemplate.mockResolvedValueOnce({ data: null, error: "Subject is required." });
-    const result = await saveEmailTemplate("camp-1", "", "body text");
+    mockCreateTemplate.mockResolvedValueOnce({ data: null, error: "Subject is required." });
+    const result = await createTemplate("My Template", "", "body text");
     expect(result.error).toBeTruthy();
   });
 
   it("returns error when body is empty", async () => {
-    mockSaveEmailTemplate.mockResolvedValueOnce({ data: null, error: "Body is required." });
-    const result = await saveEmailTemplate("camp-1", "Subject", "");
+    mockCreateTemplate.mockResolvedValueOnce({ data: null, error: "Body is required." });
+    const result = await createTemplate("My Template", "Subject", "");
     expect(result.error).toBeTruthy();
   });
 
   it("returns null error on successful save", async () => {
     const tmpl = makeTemplate({ subject: "Great subject", body: "Body text here" });
-    mockSaveEmailTemplate.mockResolvedValueOnce({ data: tmpl, error: null });
-    const result = await saveEmailTemplate("camp-1", "Great subject", "Body text here");
+    mockCreateTemplate.mockResolvedValueOnce({ data: tmpl, error: null });
+    const result = await createTemplate("My Template", "Great subject", "Body text here");
     expect(result.error).toBeNull();
     expect(result.data?.subject).toBe("Great subject");
   });
 
-  it("returns error when DB upsert fails", async () => {
-    mockSaveEmailTemplate.mockResolvedValueOnce({ data: null, error: "DB constraint" });
-    const result = await saveEmailTemplate("camp-1", "Subject", "Body");
+  it("returns error when DB insert fails", async () => {
+    mockCreateTemplate.mockResolvedValueOnce({ data: null, error: "DB constraint" });
+    const result = await createTemplate("My Template", "Subject", "Body");
     expect(result.error).toBeTruthy();
   });
 });
@@ -310,27 +316,40 @@ describe("EmailComposer", () => {
 
   // ── Save Template ─────────────────────────────────────────────────────────
 
-  it("calls saveEmailTemplate when Save button is clicked after editing", async () => {
-    mockSaveEmailTemplate.mockResolvedValueOnce({ data: makeTemplate(), error: null });
+  it("calls createTemplate when Save button is clicked and name is confirmed", async () => {
+    mockCreateTemplate.mockResolvedValueOnce({ data: makeTemplate(), error: null });
     renderComposer();
     await userEvent.type(screen.getByRole("textbox", { name: /email subject/i }), "New subject");
+    await userEvent.type(screen.getByRole("textbox", { name: /email body/i }), "Some body text");
     await userEvent.click(screen.getByRole("button", { name: /save template/i }));
-    await waitFor(() => expect(mockSaveEmailTemplate).toHaveBeenCalledOnce());
+    // Modal should open — type a name and confirm
+    await waitFor(() => expect(screen.getByRole("textbox", { name: /template name/i })).toBeInTheDocument());
+    await userEvent.type(screen.getByRole("textbox", { name: /template name/i }), "My Template");
+    await userEvent.click(screen.getByRole("button", { name: /confirm save template/i }));
+    await waitFor(() => expect(mockCreateTemplate).toHaveBeenCalledOnce());
   });
 
   it("shows Template saved confirmation after successful save", async () => {
-    mockSaveEmailTemplate.mockResolvedValueOnce({ data: makeTemplate(), error: null });
+    mockCreateTemplate.mockResolvedValueOnce({ data: makeTemplate(), error: null });
     renderComposer();
     await userEvent.type(screen.getByRole("textbox", { name: /email subject/i }), "My subject");
+    await userEvent.type(screen.getByRole("textbox", { name: /email body/i }), "Some body text");
     await userEvent.click(screen.getByRole("button", { name: /save template/i }));
+    await waitFor(() => expect(screen.getByRole("textbox", { name: /template name/i })).toBeInTheDocument());
+    await userEvent.type(screen.getByRole("textbox", { name: /template name/i }), "My Template");
+    await userEvent.click(screen.getByRole("button", { name: /confirm save template/i }));
     await waitFor(() => expect(screen.getByText(/template saved/i)).toBeInTheDocument());
   });
 
   it("shows error message when save fails", async () => {
-    mockSaveEmailTemplate.mockResolvedValueOnce({ data: null, error: "Database error" });
+    mockCreateTemplate.mockResolvedValueOnce({ data: null, error: "Database error" });
     renderComposer();
     await userEvent.type(screen.getByRole("textbox", { name: /email subject/i }), "My subject");
+    await userEvent.type(screen.getByRole("textbox", { name: /email body/i }), "Some body text");
     await userEvent.click(screen.getByRole("button", { name: /save template/i }));
+    await waitFor(() => expect(screen.getByRole("textbox", { name: /template name/i })).toBeInTheDocument());
+    await userEvent.type(screen.getByRole("textbox", { name: /template name/i }), "My Template");
+    await userEvent.click(screen.getByRole("button", { name: /confirm save template/i }));
     await waitFor(() => expect(screen.getByText(/database error/i)).toBeInTheDocument());
   });
 
@@ -393,5 +412,101 @@ describe("EmailComposer", () => {
     await waitFor(() => screen.getByRole("button", { name: "Alice1" }));
     await userEvent.click(screen.getByRole("button", { name: "Alice1" }));
     await waitFor(() => expect(screen.getByText("Hi Alice1")).toBeInTheDocument());
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Suite 5 — AI Writer Panel (/ command)
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("AI Writer Panel", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("opens the AI writer panel when / is typed in an empty body", async () => {
+    renderComposer();
+    const bodyEl = screen.getByRole("textbox", { name: /email body/i });
+    await userEvent.type(bodyEl, "/");
+    await waitFor(() =>
+      expect(screen.getByText(/write with ai/i)).toBeInTheDocument()
+    );
+  });
+
+  it("closes the AI writer panel when the close button is clicked", async () => {
+    renderComposer();
+    const bodyEl = screen.getByRole("textbox", { name: /email body/i });
+    await userEvent.type(bodyEl, "/");
+    await waitFor(() => screen.getByRole("textbox", { name: /ai writer prompt/i }));
+    await userEvent.click(screen.getByRole("button", { name: /close ai writer/i }));
+    await waitFor(() =>
+      expect(screen.queryByRole("textbox", { name: /ai writer prompt/i })).not.toBeInTheDocument()
+    );
+  });
+
+  it("shows both mode buttons: From prompt and Polish draft", async () => {
+    renderComposer();
+    const bodyEl = screen.getByRole("textbox", { name: /email body/i });
+    await userEvent.type(bodyEl, "/");
+    await waitFor(() => screen.getByText(/write with ai/i));
+    expect(screen.getByRole("button", { name: /from prompt/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /polish draft/i })).toBeInTheDocument();
+  });
+
+  it("Generate button is disabled when prompt textarea is empty", async () => {
+    renderComposer();
+    const bodyEl = screen.getByRole("textbox", { name: /email body/i });
+    await userEvent.type(bodyEl, "/");
+    await waitFor(() => screen.getByText(/write with ai/i));
+    expect(screen.getByRole("button", { name: /ai writer generate/i })).toBeDisabled();
+  });
+
+  it("calls polishEmailWithAI in prompt mode and populates body", async () => {
+    mockPolishEmailWithAI.mockResolvedValueOnce({ body: "Generated body text", subject: "Gen Subject" });
+    renderComposer();
+    const bodyEl = screen.getByRole("textbox", { name: /email body/i });
+    await userEvent.type(bodyEl, "/");
+    await waitFor(() => screen.getByRole("textbox", { name: /ai writer prompt/i }));
+    await userEvent.type(
+      screen.getByRole("textbox", { name: /ai writer prompt/i }),
+      "cold outreach for SaaS product"
+    );
+    await userEvent.click(screen.getByRole("button", { name: /ai writer generate/i }));
+    await waitFor(() => expect(mockPolishEmailWithAI).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: "prompt", userInput: "cold outreach for SaaS product" })
+    ));
+    await waitFor(() =>
+      expect(screen.queryByText(/write with ai/i)).not.toBeInTheDocument()
+    );
+    expect(screen.getByDisplayValue("Generated body text")).toBeInTheDocument();
+  });
+
+  it("calls polishEmailWithAI in polish mode", async () => {
+    mockPolishEmailWithAI.mockResolvedValueOnce({ body: "Polished body text" });
+    renderComposer();
+    const bodyEl = screen.getByRole("textbox", { name: /email body/i });
+    await userEvent.type(bodyEl, "/");
+    await waitFor(() => screen.getByRole("button", { name: /polish draft/i }));
+    await userEvent.click(screen.getByRole("button", { name: /polish draft/i }));
+    await userEvent.type(
+      screen.getByRole("textbox", { name: /ai writer prompt/i }),
+      "my rough draft text here"
+    );
+    await userEvent.click(screen.getByRole("button", { name: /ai writer polish/i }));
+    await waitFor(() => expect(mockPolishEmailWithAI).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: "polish" })
+    ));
+  });
+
+  it("shows error when polishEmailWithAI returns an error", async () => {
+    mockPolishEmailWithAI.mockResolvedValueOnce({ body: "", error: "Quota exceeded" });
+    renderComposer();
+    const bodyEl = screen.getByRole("textbox", { name: /email body/i });
+    await userEvent.type(bodyEl, "/");
+    await waitFor(() => screen.getByRole("textbox", { name: /ai writer prompt/i }));
+    await userEvent.type(
+      screen.getByRole("textbox", { name: /ai writer prompt/i }),
+      "some prompt"
+    );
+    await userEvent.click(screen.getByRole("button", { name: /ai writer generate/i }));
+    await waitFor(() => expect(screen.getByText(/quota exceeded/i)).toBeInTheDocument());
   });
 });

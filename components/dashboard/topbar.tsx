@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import { signout } from "@/lib/supabase/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Overview" },
@@ -68,14 +68,16 @@ export default function DashboardTopbar({ user }: { user: User }) {
             </div>
             <nav className="p-3 space-y-1">
               {NAV_ITEMS.map((item) => (
-                <Link key={item.href} href={item.href} className="block">
-                  <div
-                    className="px-3 py-2 rounded-lg text-sm"
-                    style={{ color: "var(--rk-text)", border: "1px solid transparent" }}
-                  >
-                    {item.label}
-                  </div>
-                </Link>
+                <SheetClose key={item.href} asChild>
+                  <Link href={item.href} className="block">
+                    <div
+                      className="px-3 py-2 rounded-lg text-sm"
+                      style={{ color: "var(--rk-text)", border: "1px solid transparent" }}
+                    >
+                      {item.label}
+                    </div>
+                  </Link>
+                </SheetClose>
               ))}
             </nav>
           </SheetContent>

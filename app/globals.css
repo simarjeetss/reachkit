@@ -216,7 +216,19 @@
 
 .rk-auth-input:focus {
   border-color: var(--rk-gold);
-  box-shadow: 0 0 0 3px rgba(212,168,83,0.12);
+  box-shadow: 0 0 0 3px rgba(212,168,83,0.14);
+}
+
+/* light-mode overrides so text is always visible against the beige input */
+.light .rk-auth-input {
+  background: #fff;
+  border-color: rgba(0,0,0,0.14);
+  color: #1a1714;
+}
+.light .rk-auth-input::placeholder { color: #b5afa6; }
+.light .rk-auth-input:focus {
+  border-color: #b8873a;
+  box-shadow: 0 0 0 3px rgba(184,135,58,0.14);
 }
 
 .rk-btn-gold {

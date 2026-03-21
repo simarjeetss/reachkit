@@ -19,12 +19,12 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("rk-theme") as Theme | null;
-    const resolved = stored ?? "dark";
+    const resolved = stored ?? "light";
     setTheme(resolved);
     setMounted(true);
   }, []);

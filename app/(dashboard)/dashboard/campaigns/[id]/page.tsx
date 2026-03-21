@@ -1,5 +1,6 @@
 import { getCampaign, getContacts } from "@/lib/supabase/campaigns";
 import { getProfile } from "@/lib/supabase/profile";
+import { getCampaignStats } from "@/lib/supabase/sent-emails";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import CampaignStatusSelect from "@/components/campaigns/campaign-status-select";
@@ -23,7 +24,8 @@ export default async function CampaignDetailPage({
     { data: campaign, error: cError },
     { data: contacts, error: ctError },
     { data: profile },
-  ] = await Promise.all([getCampaign(id), getContacts(id), getProfile()]);
+    stats,
+  ] = await Promise.all([getCampaign(id), getContacts(id), getProfile(), getCampaignStats(id)]);
 
   if (cError || !campaign) notFound();
 
@@ -76,11 +78,13 @@ export default async function CampaignDetailPage({
       </div>
 
       {/* Stats strip */}
-      <div className="rk-fade-up rk-delay-1 grid grid-cols-3 gap-3 mb-8">
+      <div className="rk-fade-up rk-delay-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
         {[
-          { label: "Contacts", value: contacts.length },
-          { label: "Emails Sent", value: 0 },
-          { label: "Open Rate", value: "—" },
+          { label: "Contacts",   value: contacts.length },
+          { label: "Sent",       value: stats.sent },
+          { label: "Opened",     value: stats.opened },
+          { label: "Open Rate",  value: stats.openRate },
+          { label: "Click Rate", value: stats.clickRate },
         ].map((s) => (
           <div
             key={s.label}

@@ -39,7 +39,8 @@ Sender: ${sender}
 Rules:
 - Subject line: punchy, under 50 characters, no spam words
 - Body: 3–5 short paragraphs, friendly but professional tone
-- Use these exact placeholder variables where appropriate: {{first_name}}, {{company}}, {{sender_name}}
+- Use {{first_name}} and {{company}} as exact placeholder variables in your output (keep the double curly braces literally — they get replaced per-contact at send time)
+- Write the sender's name as "${sender}" naturally — do NOT output {{sender_name}} as a placeholder
 - End with a clear, single call-to-action
 - No hollow filler phrases like "I hope this email finds you well"
 - Do NOT include a sign-off line like "Best regards" — the system adds that automatically

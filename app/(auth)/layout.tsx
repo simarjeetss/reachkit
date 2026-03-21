@@ -8,83 +8,75 @@ export default function AuthLayout({
       className="min-h-screen flex"
       style={{ background: "var(--rk-bg)" }}
     >
-      {/* Left panel — decorative */}
+      {/* ── Left panel — always dark, decorative ────────────────────── */}
       <div
-        className="hidden lg:flex lg:w-[52%] relative overflow-hidden flex-col justify-between p-12"
+        className="hidden lg:flex lg:w-[48%] relative overflow-hidden flex-col justify-between p-14"
         style={{
-          background:
-            "linear-gradient(135deg, #0d0d0f 0%, #141416 40%, #1a1508 100%)",
-          borderRight: "1px solid var(--rk-border)",
+          background: "linear-gradient(145deg, #111009 0%, #0d0d0f 50%, #131110 100%)",
+          borderRight: "1px solid rgba(255,255,255,0.06)",
         }}
       >
-        {/* Ambient glow */}
+        {/* Ambient gold glow — top left */}
         <div
-          className="absolute"
+          aria-hidden
+          className="absolute pointer-events-none"
           style={{
-            top: "15%",
-            left: "10%",
-            width: "420px",
-            height: "420px",
-            background:
-              "radial-gradient(circle, rgba(212,168,83,0.08) 0%, transparent 70%)",
-            pointerEvents: "none",
+            top: "-60px", left: "-60px",
+            width: "500px", height: "500px",
+            background: "radial-gradient(circle, rgba(212,168,83,0.1) 0%, transparent 65%)",
           }}
         />
+        {/* Ambient gold glow — bottom right */}
         <div
-          className="absolute"
+          aria-hidden
+          className="absolute pointer-events-none"
           style={{
-            bottom: "10%",
-            right: "5%",
-            width: "300px",
-            height: "300px",
-            background:
-              "radial-gradient(circle, rgba(212,168,83,0.05) 0%, transparent 70%)",
-            pointerEvents: "none",
+            bottom: "-40px", right: "-40px",
+            width: "380px", height: "380px",
+            background: "radial-gradient(circle, rgba(212,168,83,0.07) 0%, transparent 65%)",
           }}
         />
 
-        {/* Grid lines */}
+        {/* Subtle dot grid */}
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
           style={{
-            backgroundImage:
-              "linear-gradient(var(--rk-gold) 1px, transparent 1px), linear-gradient(90deg, var(--rk-gold) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
+            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
           }}
         />
 
-        {/* Logo */}
+        {/* Logo — always light text on dark bg */}
         <div className="rk-fade-up relative z-10">
           <span
             className="text-2xl font-bold tracking-tight"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--rk-text)",
-            }}
+            style={{ fontFamily: "var(--font-display)", color: "#f0ede8" }}
           >
-            ReachKit<span style={{ color: "var(--rk-gold)" }}>.ai</span>
+            ReachKit<span style={{ color: "#d4a853" }}>.ai</span>
           </span>
         </div>
 
         {/* Central quote */}
-        <div className="relative z-10">
+        <div className="relative z-10 max-w-md">
           <div
-            className="rk-fade-up rk-delay-1 mb-6 w-10 h-[2px]"
-            style={{ background: "var(--rk-gold)" }}
+            className="rk-fade-up rk-delay-1 mb-8 w-10 h-[2px]"
+            style={{ background: "#d4a853" }}
           />
           <blockquote
-            className="rk-fade-up rk-delay-2 mb-6 text-4xl font-medium leading-tight"
+            className="rk-fade-up rk-delay-2 mb-5 text-[2.15rem] font-medium leading-[1.18]"
             style={{
               fontFamily: "var(--font-display)",
-              color: "var(--rk-text)",
+              color: "#f0ede8",
               fontStyle: "italic",
+              letterSpacing: "-0.01em",
             }}
           >
-            "The right email, to the right person, at exactly the right moment."
+            &ldquo;The right email, to the right person, at exactly the right moment.&rdquo;
           </blockquote>
           <p
             className="rk-fade-up rk-delay-3 text-sm"
-            style={{ color: "var(--rk-text-muted)" }}
+            style={{ color: "rgba(240,237,232,0.45)", fontFamily: "var(--font-body)" }}
           >
             AI-powered outreach that learns your voice
           </p>
@@ -94,22 +86,19 @@ export default function AuthLayout({
         <div className="rk-fade-up rk-delay-4 relative z-10 grid grid-cols-3 gap-6">
           {[
             { value: "GPT-4", label: "Powered" },
-            { value: "∞", label: "Contacts" },
-            { value: "Auto", label: "Follow-ups" },
+            { value: "∞",     label: "Contacts" },
+            { value: "Auto",  label: "Follow-ups" },
           ].map((stat) => (
             <div key={stat.label}>
               <div
                 className="text-2xl font-bold mb-1"
-                style={{
-                  fontFamily: "var(--font-display)",
-                  color: "var(--rk-gold)",
-                }}
+                style={{ fontFamily: "var(--font-display)", color: "#d4a853" }}
               >
                 {stat.value}
               </div>
               <div
                 className="text-xs uppercase tracking-widest"
-                style={{ color: "var(--rk-text-sub)" }}
+                style={{ color: "rgba(240,237,232,0.3)", fontFamily: "var(--font-body)" }}
               >
                 {stat.label}
               </div>
@@ -118,22 +107,32 @@ export default function AuthLayout({
         </div>
       </div>
 
-      {/* Right panel — form */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+      {/* ── Right panel — form, theme-aware ─────────────────────────── */}
+      <div
+        className="flex-1 flex flex-col items-center justify-center px-6 py-12"
+        style={{ background: "var(--rk-bg)" }}
+      >
         {/* Mobile logo */}
         <div className="lg:hidden mb-10 rk-fade-in">
           <span
             className="text-2xl font-bold"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--rk-text)",
-            }}
+            style={{ fontFamily: "var(--font-display)", color: "var(--rk-text)" }}
           >
             ReachKit<span style={{ color: "var(--rk-gold)" }}>.ai</span>
           </span>
         </div>
 
-        <div className="w-full max-w-[400px]">{children}</div>
+        {/* Form card with a subtle lift on light mode */}
+        <div
+          className="w-full max-w-[400px] rounded-2xl p-8 sm:p-10"
+          style={{
+            background: "var(--rk-surface)",
+            border: "1px solid var(--rk-border-md)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.06)",
+          }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

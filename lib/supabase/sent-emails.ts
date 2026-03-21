@@ -12,6 +12,35 @@ export type SendCampaignResult = {
   error: string | null;
 };
 
+export type CampaignStats = {
+  sent: number;
+  opened: number;
+  clicked: number;
+  openRate: string;
+  clickRate: string;
+};
+
+export async function getCampaignStats(campaignId: string): Promise<CampaignStats> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("sent_emails")
+    .select("status, opened_at, clicked_at")
+    .eq("campaign_id", campaignId);
+
+  if (error || !data || data.length === 0) {
+    return { sent: 0, opened: 0, clicked: 0, openRate: "—", clickRate: "—" };
+  }
+
+  const sent    = data.filter((r) => r.status === "sent").length;
+  const opened  = data.filter((r) => r.opened_at  !== null).length;
+  const clicked = data.filter((r) => r.clicked_at !== null).length;
+
+  const openRate  = sent > 0 ? `${Math.round((opened  / sent) * 100)}%` : "—";
+  const clickRate = sent > 0 ? `${Math.round((clicked / sent) * 100)}%` : "—";
+
+  return { sent, opened, clicked, openRate, clickRate };
+}
+
 function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;

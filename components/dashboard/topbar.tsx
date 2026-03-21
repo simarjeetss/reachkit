@@ -1,9 +1,18 @@
 "use client";
 
 import { useTransition } from "react";
+import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import { signout } from "@/lib/supabase/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
+const NAV_ITEMS = [
+  { href: "/dashboard", label: "Overview" },
+  { href: "/dashboard/campaigns", label: "Campaigns" },
+  { href: "/dashboard/contacts", label: "Contacts" },
+  { href: "/dashboard/analytics", label: "Analytics" },
+];
 
 export default function DashboardTopbar({ user }: { user: User }) {
   const [isPending, startTransition] = useTransition();
@@ -22,8 +31,55 @@ export default function DashboardTopbar({ user }: { user: User }) {
         borderBottom: "1px solid var(--rk-border)",
       }}
     >
-      {/* Left — mobile logo */}
-      <div className="lg:hidden">
+      {/* Left — mobile menu + logo */}
+      <div className="lg:hidden flex items-center gap-2">
+        <Sheet>
+          <SheetTrigger
+            className="flex items-center justify-center w-9 h-9 rounded-lg"
+            style={{ border: "1px solid var(--rk-border)", color: "var(--rk-text)" }}
+            aria-label="Open navigation"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="4" y1="6" x2="20" y2="6" />
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <line x1="4" y1="18" x2="20" y2="18" />
+            </svg>
+          </SheetTrigger>
+          <SheetContent side="left" className="p-0" style={{ background: "var(--rk-surface)" }}>
+            <div className="px-5 py-4" style={{ borderBottom: "1px solid var(--rk-border)" }}>
+              <span
+                className="text-lg font-bold"
+                style={{ fontFamily: "var(--font-display)", color: "var(--rk-text)" }}
+              >
+                ReachKit<span style={{ color: "var(--rk-gold)" }}>.ai</span>
+              </span>
+              <p className="text-xs mt-1" style={{ color: "var(--rk-text-muted)" }}>
+                {user.email}
+              </p>
+            </div>
+            <nav className="p-3 space-y-1">
+              {NAV_ITEMS.map((item) => (
+                <Link key={item.href} href={item.href} className="block">
+                  <div
+                    className="px-3 py-2 rounded-lg text-sm"
+                    style={{ color: "var(--rk-text)", border: "1px solid transparent" }}
+                  >
+                    {item.label}
+                  </div>
+                </Link>
+              ))}
+            </nav>
+          </SheetContent>
+        </Sheet>
         <span
           className="text-lg font-bold"
           style={{ fontFamily: "var(--font-display)", color: "var(--rk-text)" }}

@@ -1,6 +1,7 @@
 "use server";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { checkAndIncrementAiUsage, FREE_AI_LIMIT } from "@/lib/supabase/ai-usage";
 
 export interface GenerateEmailInput {
   campaignName: string;
@@ -22,6 +23,21 @@ export async function generateEmailWithAI(
 ): Promise<GenerateEmailResult> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return { subject: "", body: "", error: "AI is not configured. Add GEMINI_API_KEY to your environment." };
+
+  // ── Rate-limit check ──────────────────────────────────────────────────────
+  const usage = await checkAndIncrementAiUsage();
+  if (usage.limitExceeded) {
+    return {
+      subject: "",
+      body: "",
+      error: `__RATE_LIMIT__:You've used all ${FREE_AI_LIMIT} free AI generations. Upgrade to a paid plan for unlimited access.`,
+    };
+  }
+  if (usage.error) {
+    // Non-fatal — log and continue (don't block on auth issues)
+    console.warn("[AI rate limit] Usage check error:", usage.error);
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });

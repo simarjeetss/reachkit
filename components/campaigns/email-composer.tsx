@@ -84,6 +84,9 @@ export default function EmailComposer({
   const [sendStatus, setSendStatus] = useState<"idle" | "sent" | "error">("idle");
   const [sendSummary, setSendSummary] = useState<{ sent: number; failed: number } | null>(null);
 
+  // AI rate-limit upgrade modal
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
   // Focus name input when modal opens
   useEffect(() => {
     if (showSaveModal) {
@@ -206,7 +209,14 @@ export default function EmailComposer({
         contactCompany:   sample?.company,
         senderName:       profile?.full_name,
       });
-      if (result.error) { setAiError(result.error); return; }
+      if (result.error) {
+        if (result.error.startsWith("__RATE_LIMIT__:")) {
+          setShowUpgradeModal(true);
+        } else {
+          setAiError(result.error);
+        }
+        return;
+      }
       setSubject(result.subject);
       setBody(result.body);
       setSaveStatus("idle");
@@ -269,7 +279,15 @@ export default function EmailComposer({
         campaignName,
         senderName:   profile?.full_name,
       });
-      if (result.error) { setAiWriterError(result.error); return; }
+      if (result.error) {
+        if (result.error.startsWith("__RATE_LIMIT__:")) {
+          closeAiWriter();
+          setShowUpgradeModal(true);
+        } else {
+          setAiWriterError(result.error);
+        }
+        return;
+      }
       setBody(result.body);
       if (result.subject) setSubject(result.subject);
       setSaveStatus("idle");
@@ -279,6 +297,95 @@ export default function EmailComposer({
 
   return (
     <div className="space-y-4">
+
+      {/* ── AI Upgrade modal ─────────────────────────────────────────────── */}
+      {showUpgradeModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowUpgradeModal(false); }}
+        >
+          <div
+            className="rk-fade-up w-full max-w-sm mx-4 rounded-2xl overflow-hidden"
+            style={{
+              background: "linear-gradient(160deg, #1a1610 0%, #141210 100%)",
+              border: "1px solid rgba(212,168,83,0.3)",
+              boxShadow: "0 24px 64px rgba(0,0,0,0.8)",
+            }}
+          >
+            {/* Gold top bar */}
+            <div className="h-[3px]" style={{ background: "linear-gradient(90deg, var(--rk-gold) 0%, rgba(212,168,83,0.3) 100%)" }} />
+
+            <div className="p-6 flex flex-col gap-5">
+              {/* Icon + heading */}
+              <div className="flex items-start gap-3">
+                <div
+                  className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
+                  style={{ background: "rgba(212,168,83,0.12)", border: "1px solid rgba(212,168,83,0.25)" }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--rk-gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-semibold text-sm mb-0.5" style={{ color: "#f0ede8", fontFamily: "var(--font-display)" }}>
+                    AI generation limit reached
+                  </p>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
+                    You&apos;ve used all 15 free AI generations. Upgrade to a paid plan for unlimited AI drafting and personalization.
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature bullets */}
+              <ul className="space-y-2">
+                {[
+                  "Unlimited AI email generation",
+                  "AI Writer with prompt & polish modes",
+                  "Smart follow-up sequences",
+                  "10,000+ emails per month",
+                ].map((f) => (
+                  <li key={f} className="flex items-center gap-2">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--rk-gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 pt-1">
+                <a
+                  href="/pricing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 text-center text-sm font-semibold py-2.5 rounded-xl"
+                  style={{
+                    background: "var(--rk-gold)",
+                    color: "#0d0d0f",
+                    textDecoration: "none",
+                  }}
+                >
+                  View plans →
+                </a>
+                <button
+                  onClick={() => setShowUpgradeModal(false)}
+                  className="flex-1 text-sm py-2.5 rounded-xl"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "rgba(255,255,255,0.5)",
+                    cursor: "pointer",
+                  }}
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Save-as modal ────────────────────────────────────────────────── */}
       {showSaveModal && (

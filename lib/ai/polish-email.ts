@@ -1,6 +1,7 @@
 "use server";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { checkAndIncrementAiUsage, FREE_AI_LIMIT } from "@/lib/supabase/ai-usage";
 
 export interface PolishEmailInput {
   userInput: string;
@@ -24,6 +25,19 @@ export async function polishEmailWithAI(
 
   if (!input.userInput.trim())
     return { body: "", error: "Please enter a prompt or draft before generating." };
+
+  // ── Rate-limit check ──────────────────────────────────────────────────────
+  const usage = await checkAndIncrementAiUsage();
+  if (usage.limitExceeded) {
+    return {
+      body: "",
+      error: `__RATE_LIMIT__:You've used all ${FREE_AI_LIMIT} free AI generations. Upgrade to a paid plan for unlimited access.`,
+    };
+  }
+  if (usage.error) {
+    console.warn("[AI rate limit] Usage check error:", usage.error);
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });

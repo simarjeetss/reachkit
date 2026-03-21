@@ -1,11 +1,11 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import { signout } from "@/lib/supabase/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Overview" },
@@ -16,6 +16,7 @@ const NAV_ITEMS = [
 
 export default function DashboardTopbar({ user }: { user: User }) {
   const [isPending, startTransition] = useTransition();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   function handleSignOut() {
     startTransition(async () => {
@@ -33,7 +34,7 @@ export default function DashboardTopbar({ user }: { user: User }) {
     >
       {/* Left — mobile menu + logo */}
       <div className="lg:hidden flex items-center gap-2">
-        <Sheet>
+  <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
           <SheetTrigger
             className="flex items-center justify-center w-9 h-9 rounded-lg"
             style={{ border: "1px solid var(--rk-border)", color: "var(--rk-text)" }}
@@ -68,16 +69,19 @@ export default function DashboardTopbar({ user }: { user: User }) {
             </div>
             <nav className="p-3 space-y-1">
               {NAV_ITEMS.map((item) => (
-                <SheetClose key={item.href} asChild>
-                  <Link href={item.href} className="block">
-                    <div
-                      className="px-3 py-2 rounded-lg text-sm"
-                      style={{ color: "var(--rk-text)", border: "1px solid transparent" }}
-                    >
-                      {item.label}
-                    </div>
-                  </Link>
-                </SheetClose>
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="block"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div
+                    className="px-3 py-2 rounded-lg text-sm"
+                    style={{ color: "var(--rk-text)", border: "1px solid transparent" }}
+                  >
+                    {item.label}
+                  </div>
+                </Link>
               ))}
             </nav>
           </SheetContent>

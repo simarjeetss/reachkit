@@ -28,6 +28,10 @@ export type Contact = {
   created_at: string;
 };
 
+export type ContactWithCampaign = Contact & {
+  campaign_name: string | null;
+};
+
 // ─── Campaign actions ─────────────────────────────────────────────────────────
 
 export async function getCampaigns(): Promise<{ data: Campaign[]; error: string | null }> {
@@ -148,6 +152,32 @@ export async function getContacts(campaignId: string): Promise<{ data: Contact[]
 
   if (error) return { data: [], error: error.message };
   return { data: (data ?? []) as Contact[], error: null };
+}
+
+export async function getAllContacts(): Promise<{ data: ContactWithCampaign[]; error: string | null }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { data: [], error: "Not authenticated" };
+
+  const { data, error } = await supabase
+    .from("contacts")
+    .select("*, campaigns(name)")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) return { data: [], error: error.message };
+
+  const contacts = (data ?? []).map((row: Record<string, unknown>) => {
+    const campaign = row.campaigns as { name?: string } | null;
+    const { campaigns: _c, ...rest } = row;
+    void _c;
+    return {
+      ...(rest as Contact),
+      campaign_name: campaign?.name ?? null,
+    } as ContactWithCampaign;
+  });
+
+  return { data: contacts, error: null };
 }
 
 export async function addContact(

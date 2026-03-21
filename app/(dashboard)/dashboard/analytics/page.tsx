@@ -57,7 +57,7 @@ export default async function AnalyticsPage({
     ? Math.max(1, Math.min(rawRange, 365))
     : 30;
   const { campaigns, rows, error } = await getAnalyticsOverview(rangeDays);
-  const selectedCampaignId = resolvedSearchParams?.campaign ?? campaigns[0]?.id ?? "";
+  const selectedCampaignId = resolvedSearchParams?.campaign ?? "";
 
   const filteredRows = selectedCampaignId
     ? rows.filter((row) => row.campaign_id === selectedCampaignId)

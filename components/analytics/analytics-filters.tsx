@@ -1,8 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export type AnalyticsFiltersProps = {
   campaigns: { id: string; name: string }[];
@@ -17,7 +23,7 @@ export default function AnalyticsFilters({
 }: AnalyticsFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [campaign, setCampaign] = useState(selectedCampaignId);
+  const [campaign, setCampaign] = useState(selectedCampaignId || "all");
 
   const baseParams = useMemo(() => {
     const params = new URLSearchParams(searchParams?.toString());
@@ -25,28 +31,36 @@ export default function AnalyticsFilters({
     return params;
   }, [searchParams, rangeDays]);
 
-  const handleApply = () => {
+  useEffect(() => {
+    setCampaign(selectedCampaignId || "all");
+  }, [selectedCampaignId]);
+
+  const handleChange = (value: string) => {
+    setCampaign(value);
     const params = new URLSearchParams(baseParams);
-    params.set("campaign", campaign);
+    if (value === "all") {
+      params.delete("campaign");
+    } else {
+      params.set("campaign", value);
+    }
     router.replace(`/dashboard/analytics?${params.toString()}`);
   };
 
   return (
     <div className="flex items-center gap-2">
-      <select
-        value={campaign}
-        onChange={(event) => setCampaign(event.target.value)}
-        className="h-9 rounded-md border border-white/10 bg-[var(--rk-surface-2)] px-3 text-xs text-[var(--rk-text)]"
-      >
-        {campaigns.map((item) => (
-          <option key={item.id} value={item.id}>
-            {item.name}
-          </option>
-        ))}
-      </select>
-      <Button size="sm" type="button" variant="outline" onClick={handleApply}>
-        Apply
-      </Button>
+      <Select value={campaign} onValueChange={handleChange}>
+        <SelectTrigger className="w-[220px] bg-[var(--rk-surface-2)] text-[var(--rk-text)]">
+          <SelectValue placeholder="Select campaign" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All campaigns</SelectItem>
+          {campaigns.map((item) => (
+            <SelectItem key={item.id} value={item.id}>
+              {item.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

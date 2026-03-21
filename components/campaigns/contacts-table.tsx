@@ -69,9 +69,9 @@ export default function ContactsTable({
   return (
     <div className="space-y-3">
       {/* ── Toolbar: search + page-size ──────────────────────────────────── */}
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         {/* Search */}
-        <div className="relative flex-1">
+        <div className="relative flex-1 w-full">
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
             width="13" height="13" viewBox="0 0 24 24" fill="none"
@@ -91,7 +91,7 @@ export default function ContactsTable({
         </div>
 
         {/* Page-size selector */}
-        <div className="flex items-center gap-1.5 shrink-0">
+  <div className="flex items-center gap-1.5 shrink-0 sm:ml-auto">
           <span className="text-[11px] uppercase tracking-widest" style={{ color: "var(--rk-text-sub)" }}>
             Show
           </span>
@@ -118,41 +118,43 @@ export default function ContactsTable({
       </div>
 
       {/* ── Table ────────────────────────────────────────────────────────── */}
-      <div
-        className="rounded-xl overflow-hidden"
-        style={{ background: "var(--rk-surface)", border: "1px solid var(--rk-border)" }}
-      >
-        {/* Header */}
+      <div className="overflow-x-auto">
         <div
-          className="grid grid-cols-[1fr_1fr_auto] gap-3 px-4 py-2.5 text-[10px] uppercase tracking-widest"
-          style={{ borderBottom: "1px solid var(--rk-border)", color: "var(--rk-text-sub)" }}
+          className="rounded-xl overflow-hidden min-w-[520px]"
+          style={{ background: "var(--rk-surface)", border: "1px solid var(--rk-border)" }}
         >
-          <span>Email / Name</span>
-          <span>Company</span>
-          <span />
-        </div>
+          {/* Header */}
+          <div
+            className="grid grid-cols-[1fr_1fr_auto] gap-3 px-4 py-2.5 text-[10px] uppercase tracking-widest"
+            style={{ borderBottom: "1px solid var(--rk-border)", color: "var(--rk-text-sub)" }}
+          >
+            <span>Email / Name</span>
+            <span>Company</span>
+            <span />
+          </div>
 
-        {/* Rows */}
-        {slice.length > 0 ? (
-          <div className="divide-y divide-[var(--rk-border)]">
-            {slice.map((c) => (
-              <ContactRow key={c.id} contact={c} campaignId={campaignId} />
-            ))}
-          </div>
-        ) : (
-          <div className="py-12 text-center">
-            <p className="text-sm" style={{ color: "var(--rk-text-muted)" }}>
-              No contacts match <span style={{ color: "var(--rk-gold)" }}>"{query}"</span>
-            </p>
-            <button
-              onClick={() => handleQueryChange("")}
-              className="mt-2 text-xs underline"
-              style={{ color: "var(--rk-text-sub)", background: "none", border: "none", cursor: "pointer" }}
-            >
-              Clear search
-            </button>
-          </div>
-        )}
+          {/* Rows */}
+          {slice.length > 0 ? (
+            <div className="divide-y divide-[var(--rk-border)]">
+              {slice.map((c) => (
+                <ContactRow key={c.id} contact={c} campaignId={campaignId} />
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center">
+              <p className="text-sm" style={{ color: "var(--rk-text-muted)" }}>
+                No contacts match <span style={{ color: "var(--rk-gold)" }}>&quot;{query}&quot;</span>
+              </p>
+              <button
+                onClick={() => handleQueryChange("")}
+                className="mt-2 text-xs underline"
+                style={{ color: "var(--rk-text-sub)", background: "none", border: "none", cursor: "pointer" }}
+              >
+                Clear search
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ── Footer: count + pagination ───────────────────────────────────── */}

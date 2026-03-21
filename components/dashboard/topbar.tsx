@@ -16,7 +16,7 @@ export default function DashboardTopbar({ user }: { user: User }) {
 
   return (
     <header
-      className="flex items-center justify-between px-6 lg:px-8 h-16 shrink-0"
+      className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16 shrink-0"
       style={{
         background: "var(--rk-surface)",
         borderBottom: "1px solid var(--rk-border)",
@@ -43,7 +43,7 @@ export default function DashboardTopbar({ user }: { user: User }) {
       </div>
 
       {/* Right */}
-      <div className="flex items-center gap-3">
+  <div className="flex items-center gap-2 sm:gap-3">
         {/* Status badge */}
         <div
           className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
@@ -79,7 +79,7 @@ export default function DashboardTopbar({ user }: { user: User }) {
         <button
           onClick={handleSignOut}
           disabled={isPending}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs transition-all"
           style={{
             background: "transparent",
             border: "1px solid var(--rk-border)",
@@ -112,7 +112,9 @@ export default function DashboardTopbar({ user }: { user: User }) {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          {isPending ? "Signing out…" : "Sign out"}
+          <span className="hidden sm:inline">
+            {isPending ? "Signing out…" : "Sign out"}
+          </span>
         </button>
       </div>
     </header>

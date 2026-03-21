@@ -14,7 +14,7 @@ export default async function CampaignsPage() {
   return (
     <div className="max-w-5xl mx-auto">
       {/* Header */}
-      <div className="rk-fade-up flex items-start justify-between mb-8">
+  <div className="rk-fade-up flex flex-wrap items-start justify-between gap-3 mb-8">
         <div>
           <h1
             className="text-3xl font-medium mb-1"
@@ -28,9 +28,9 @@ export default async function CampaignsPage() {
               : `${campaigns.length} campaign${campaigns.length !== 1 ? "s" : ""}`}
           </p>
         </div>
-        <Link href="/dashboard/campaigns/new">
+        <Link href="/dashboard/campaigns/new" className="w-full sm:w-auto">
           <button
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
             style={{
               background: "var(--rk-gold)",
               color: "#0d0d0f",

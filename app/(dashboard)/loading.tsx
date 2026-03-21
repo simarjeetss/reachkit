@@ -1,38 +1,24 @@
 export default function DashboardLoading() {
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="rk-fade-in mb-8">
-        <div
-          className="h-8 w-48 rounded-lg animate-pulse"
-          style={{ background: "rgba(255,255,255,0.08)" }}
-        />
-        <div
-          className="mt-2 h-4 w-64 rounded-lg animate-pulse"
-          style={{ background: "rgba(255,255,255,0.06)" }}
-        />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, index) => (
+    <div className="max-w-5xl mx-auto min-h-[60vh] flex items-center justify-center">
+      <div className="rk-fade-in flex flex-col items-center gap-4">
+        <div className="relative w-16 h-16">
           <div
-            key={`loading-card-${index}`}
-            className="rounded-xl p-5"
-            style={{ background: "var(--rk-surface)", border: "1px solid var(--rk-border)" }}
-          >
-            <div
-              className="h-4 w-20 rounded-md animate-pulse"
-              style={{ background: "rgba(255,255,255,0.08)" }}
-            />
-            <div
-              className="mt-3 h-6 w-24 rounded-md animate-pulse"
-              style={{ background: "rgba(255,255,255,0.06)" }}
-            />
-            <div
-              className="mt-4 h-3 w-full rounded-md animate-pulse"
-              style={{ background: "rgba(255,255,255,0.05)" }}
-            />
-          </div>
-        ))}
+            className="absolute inset-0 rounded-full"
+            style={{ border: "3px solid rgba(212,168,83,0.15)" }}
+          />
+          <div
+            className="absolute inset-0 rounded-full animate-spin"
+            style={{ border: "3px solid transparent", borderTopColor: "var(--rk-gold)", borderRightColor: "var(--rk-gold-light)" }}
+          />
+          <div
+            className="absolute inset-2 rounded-full"
+            style={{ border: "2px solid rgba(212,168,83,0.12)" }}
+          />
+        </div>
+        <div className="text-xs uppercase tracking-[0.2em]" style={{ color: "var(--rk-text-sub)" }}>
+          Loading
+        </div>
       </div>
     </div>
   );

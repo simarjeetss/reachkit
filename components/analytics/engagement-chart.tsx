@@ -4,7 +4,6 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
-  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -32,9 +31,17 @@ const formatTooltipLabel = (value: string) => {
 
 export type EngagementChartProps = {
   data: TimelinePoint[];
+  visibleKeys: Array<keyof Omit<TimelinePoint, "date">>;
 };
 
-export default function EngagementChart({ data }: EngagementChartProps) {
+const SERIES = [
+  { key: "sent", label: "Sent", stroke: "var(--chart-1)", fill: "url(#sent)" },
+  { key: "opened", label: "Opened", stroke: "var(--chart-2)", fill: "url(#opened)" },
+  { key: "clicked", label: "Clicked", stroke: "var(--chart-3)", fill: "url(#clicked)" },
+  { key: "failed", label: "Failed", stroke: "#f87171", fill: "url(#failed)" },
+] as const;
+
+export default function EngagementChart({ data, visibleKeys }: EngagementChartProps) {
   return (
     <div className="h-[280px] w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -51,6 +58,10 @@ export default function EngagementChart({ data }: EngagementChartProps) {
             <linearGradient id="clicked" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="var(--chart-3)" stopOpacity={0.28} />
               <stop offset="95%" stopColor="var(--chart-3)" stopOpacity={0.05} />
+            </linearGradient>
+            <linearGradient id="failed" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#f87171" stopOpacity={0.25} />
+              <stop offset="95%" stopColor="#f87171" stopOpacity={0.05} />
             </linearGradient>
           </defs>
           <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
@@ -80,35 +91,17 @@ export default function EngagementChart({ data }: EngagementChartProps) {
             formatter={(value: number, name: string) => [value, name]}
             labelFormatter={formatTooltipLabel}
           />
-          <Legend
-            formatter={(value: string) => (
-              <span style={{ color: "var(--rk-text-muted)", fontSize: 11 }}>{value}</span>
-            )}
-          />
-          <Area
-            type="monotone"
-            dataKey="sent"
-            name="Sent"
-            stroke="var(--chart-1)"
-            strokeWidth={2}
-            fill="url(#sent)"
-          />
-          <Area
-            type="monotone"
-            dataKey="opened"
-            name="Opened"
-            stroke="var(--chart-2)"
-            strokeWidth={2}
-            fill="url(#opened)"
-          />
-          <Area
-            type="monotone"
-            dataKey="clicked"
-            name="Clicked"
-            stroke="var(--chart-3)"
-            strokeWidth={2}
-            fill="url(#clicked)"
-          />
+          {SERIES.filter((series) => visibleKeys.includes(series.key)).map((series) => (
+            <Area
+              key={series.key}
+              type="monotone"
+              dataKey={series.key}
+              name={series.label}
+              stroke={series.stroke}
+              strokeWidth={2}
+              fill={series.fill}
+            />
+          ))}
         </AreaChart>
       </ResponsiveContainer>
     </div>

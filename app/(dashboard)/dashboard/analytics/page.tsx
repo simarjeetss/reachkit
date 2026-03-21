@@ -6,7 +6,7 @@ import {
   summarizeContacts,
   type SentEmailRow,
 } from "@/lib/analytics/metrics";
-import EngagementChart from "@/components/analytics/engagement-chart";
+import EngagementTrend from "@/components/analytics/engagement-trend";
 import AnalyticsFilters from "@/components/analytics/analytics-filters";
 import AnalyticsRangeSelector from "@/components/analytics/analytics-range-selector";
 import { Button } from "@/components/ui/button";
@@ -168,7 +168,7 @@ export default async function AnalyticsPage({
             </div>
           </CardHeader>
           <CardContent>
-            <EngagementChart data={timeline} />
+            <EngagementTrend data={timeline} />
           </CardContent>
         </Card>
 

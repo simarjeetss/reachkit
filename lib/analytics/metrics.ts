@@ -29,6 +29,7 @@ export type TimelinePoint = {
   sent: number;
   opened: number;
   clicked: number;
+  failed: number;
 };
 
 export type ContactEngagement = {
@@ -91,7 +92,7 @@ export function buildTimeline(rows: SentEmailRow[], rangeDays: number): Timeline
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + i);
     const key = getDateKey(date);
-    buckets.set(key, { date: key, sent: 0, opened: 0, clicked: 0 });
+    buckets.set(key, { date: key, sent: 0, opened: 0, clicked: 0, failed: 0 });
   }
 
   const increment = (value: string | null, field: keyof Omit<TimelinePoint, "date">) => {
@@ -107,6 +108,9 @@ export function buildTimeline(rows: SentEmailRow[], rangeDays: number): Timeline
     increment(row.sent_at ?? row.created_at, "sent");
     increment(row.opened_at, "opened");
     increment(row.clicked_at, "clicked");
+    if (row.status === "failed") {
+      increment(row.sent_at ?? row.created_at, "failed");
+    }
   });
 
   return Array.from(buckets.values());

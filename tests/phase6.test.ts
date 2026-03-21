@@ -71,6 +71,7 @@ describe("analytics metrics", () => {
     expect(first?.sent).toBe(1);
     expect(first?.opened).toBe(1);
     expect(second?.clicked).toBe(1);
+    expect(second?.failed).toBe(1);
   });
 
   it("summarizes contacts", () => {

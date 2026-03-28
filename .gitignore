@@ -43,3 +43,5 @@ next-env.d.ts
 #misc
 MISC.md
 .env*.local
+
+/scripts

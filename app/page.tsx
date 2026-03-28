@@ -36,13 +36,31 @@ export default function Home() {
         className="flex items-center justify-between px-6 sm:px-12 lg:px-20 h-16"
         style={{ borderBottom: "1px solid var(--rk-border)" }}
       >
-        <span
-          className="text-xl font-bold tracking-tight"
-          style={{ fontFamily: "var(--font-display)", color: "var(--rk-text)" }}
-        >
-          ReachKit<span style={{ color: "var(--rk-gold)" }}>.ai</span>
-        </span>
+        <Link href="/">
+          <span
+            className="text-xl font-bold tracking-tight cursor-pointer"
+            style={{ fontFamily: "var(--font-display)", color: "var(--rk-text)" }}
+          >
+            ReachKit<span style={{ color: "var(--rk-gold)" }}>.ai</span>
+          </span>
+        </Link>
         <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-5 mr-3">
+            <Link
+              href="/pricing"
+              className="text-sm"
+              style={{ color: "var(--rk-text-muted)" }}
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/blog"
+              className="text-sm"
+              style={{ color: "var(--rk-text-muted)" }}
+            >
+              Blog
+            </Link>
+          </div>
           <Link
             href="/login"
             className="text-sm px-4 py-2 rounded-lg"
@@ -429,7 +447,7 @@ export default function Home() {
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
       <footer
-        className="px-6 sm:px-12 lg:px-20 pb-10 pt-8 flex items-center justify-between flex-wrap gap-4"
+        className="px-6 sm:px-12 lg:px-20 pb-10 pt-8 flex flex-wrap items-center justify-between gap-6"
         style={{ borderTop: "1px solid var(--rk-border)" }}
       >
         <span
@@ -438,8 +456,19 @@ export default function Home() {
         >
           ReachKit<span style={{ color: "var(--rk-gold)" }}>.ai</span>
         </span>
+        <nav className="flex flex-wrap items-center gap-6">
+          {[
+            { label: "Pricing", href: "/pricing" },
+            { label: "Blog",    href: "/blog"    },
+            { label: "Sign in", href: "/login"   },
+          ].map((l) => (
+            <Link key={l.href} href={l.href} className="text-xs" style={{ color: "var(--rk-text-sub)" }}>
+              {l.label}
+            </Link>
+          ))}
+        </nav>
         <p className="text-xs" style={{ color: "var(--rk-text-sub)" }}>
-          In active development · Built with Next.js &amp; Supabase
+          © 2026 ReachKit.ai
         </p>
       </footer>
     </div>

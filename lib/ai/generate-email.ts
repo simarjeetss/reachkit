@@ -1,6 +1,8 @@
 "use server";
 
 import { vertexGenerateContent } from "./vertex-client";
+import { FREE_AI_LIMIT } from "@/lib/supabase/ai-usage-config";
+
 
 export interface GenerateEmailInput {
   campaignName: string;

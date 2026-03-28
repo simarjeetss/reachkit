@@ -138,8 +138,8 @@ export default function ContactsTable({ contacts }: { contacts: ContactWithCampa
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex-1 min-w-[220px]">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <div className="w-full lg:flex-1 min-w-[220px]">
           <Input
             type="search"
             placeholder="Search email, name, company, campaign…"
@@ -149,7 +149,7 @@ export default function ContactsTable({ contacts }: { contacts: ContactWithCampa
           />
         </div>
 
-        <div className="flex items-center gap-2">
+  <div className="flex flex-wrap items-center gap-2">
           <label className="text-[11px] uppercase tracking-widest" style={{ color: "var(--rk-text-sub)" }}>
             Campaign
           </label>
@@ -167,7 +167,7 @@ export default function ContactsTable({ contacts }: { contacts: ContactWithCampa
           </select>
         </div>
 
-        <div className="flex items-center gap-2">
+  <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1 rounded-lg border border-input px-1 py-0.5">
             <Button
               size="xs"
@@ -198,7 +198,7 @@ export default function ContactsTable({ contacts }: { contacts: ContactWithCampa
           </Button>
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0">
+  <div className="flex items-center gap-1.5 shrink-0 lg:ml-auto">
           <span className="text-[11px] uppercase tracking-widest" style={{ color: "var(--rk-text-sub)" }}>
             Show
           </span>
@@ -260,54 +260,56 @@ export default function ContactsTable({ contacts }: { contacts: ContactWithCampa
         </div>
       )}
 
-      <div
-        className="rounded-xl overflow-hidden"
-        style={{ background: "var(--rk-surface)", border: "1px solid var(--rk-border)" }}
-      >
+      <div className="overflow-x-auto">
         <div
-          className="grid grid-cols-[auto_1.2fr_1fr_1fr_auto] gap-3 px-4 py-2.5 text-[10px] uppercase tracking-widest"
-          style={{ borderBottom: "1px solid var(--rk-border)", color: "var(--rk-text-sub)" }}
+          className="rounded-xl overflow-hidden min-w-[720px]"
+          style={{ background: "var(--rk-surface)", border: "1px solid var(--rk-border)" }}
         >
-          <label className="flex items-center justify-center">
-            <input
-              type="checkbox"
-              checked={slice.length > 0 && selectedIds.size === slice.length}
-              onChange={toggleSelectAll}
-              aria-label="Select all contacts"
-            />
-          </label>
-          <span>Email / Name</span>
-          <span>Company</span>
-          <span>Campaign</span>
-          <span />
-        </div>
-
-        {slice.length > 0 ? (
-          <div className="divide-y divide-[var(--rk-border)]">
-            {slice.map((c) => (
-              <ContactRow
-                key={c.id}
-                contact={c}
-                selected={selectedIds.has(c.id)}
-                onToggle={() => toggleSelect(c.id)}
+          <div
+            className="grid grid-cols-[auto_1.2fr_1fr_1fr_auto] gap-3 px-4 py-2.5 text-[10px] uppercase tracking-widest"
+            style={{ borderBottom: "1px solid var(--rk-border)", color: "var(--rk-text-sub)" }}
+          >
+            <label className="flex items-center justify-center">
+              <input
+                type="checkbox"
+                checked={slice.length > 0 && selectedIds.size === slice.length}
+                onChange={toggleSelectAll}
+                aria-label="Select all contacts"
               />
-            ))}
+            </label>
+            <span>Email / Name</span>
+            <span>Company</span>
+            <span>Campaign</span>
+            <span />
           </div>
-        ) : (
-          <div className="py-12 text-center">
-            <p className="text-sm" style={{ color: "var(--rk-text-muted)" }}>
-              No contacts match <span style={{ color: "var(--rk-gold)" }}>&quot;{query}&quot;</span>
-            </p>
-            <Button
-              variant="link"
-              size="sm"
-              onClick={() => handleQueryChange("")}
-              className="mt-1"
-            >
-              Clear search
-            </Button>
-          </div>
-        )}
+
+          {slice.length > 0 ? (
+            <div className="divide-y divide-[var(--rk-border)]">
+              {slice.map((c) => (
+                <ContactRow
+                  key={c.id}
+                  contact={c}
+                  selected={selectedIds.has(c.id)}
+                  onToggle={() => toggleSelect(c.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center">
+              <p className="text-sm" style={{ color: "var(--rk-text-muted)" }}>
+                No contacts match <span style={{ color: "var(--rk-gold)" }}>&quot;{query}&quot;</span>
+              </p>
+              <Button
+                variant="link"
+                size="sm"
+                onClick={() => handleQueryChange("")}
+                className="mt-1"
+              >
+                Clear search
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center justify-between px-1">

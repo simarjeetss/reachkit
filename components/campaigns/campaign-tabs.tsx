@@ -34,7 +34,7 @@ export default function CampaignTabs({
     <div className="rk-fade-up rk-delay-2">
       {/* ── Tab bar ─────────────────────────────────────────────────────── */}
       <div
-        className="flex items-center gap-1 mb-6 p-1 rounded-xl w-fit"
+        className="flex flex-wrap items-center gap-1 mb-6 p-1 rounded-xl w-full sm:w-fit"
         style={{ background: "var(--rk-surface)", border: "1px solid var(--rk-border)" }}
       >
         {/* Email Template tab */}

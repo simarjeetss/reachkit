@@ -1,6 +1,6 @@
 "use server";
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { vertexGenerateContent } from "./vertex-client";
 
 export interface GenerateEmailInput {
   campaignName: string;
@@ -20,12 +20,6 @@ export interface GenerateEmailResult {
 export async function generateEmailWithAI(
   input: GenerateEmailInput
 ): Promise<GenerateEmailResult> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return { subject: "", body: "", error: "AI is not configured. Add GEMINI_API_KEY to your environment." };
-
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
   const contact = [input.contactFirstName, input.contactLastName].filter(Boolean).join(" ") || "the recipient";
   const company = input.contactCompany ?? "their company";
   const sender  = input.senderName ?? "the sender";
@@ -52,8 +46,7 @@ Respond with ONLY valid JSON in this exact shape:
 }`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
+    const text = await vertexGenerateContent(prompt);
 
     // Strip markdown code fences if present
     const clean = text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();

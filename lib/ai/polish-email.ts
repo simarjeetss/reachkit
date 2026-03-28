@@ -1,6 +1,6 @@
 "use server";
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { vertexGenerateContent } from "./vertex-client";
 
 export interface PolishEmailInput {
   userInput: string;
@@ -18,15 +18,8 @@ export interface PolishEmailResult {
 export async function polishEmailWithAI(
   input: PolishEmailInput
 ): Promise<PolishEmailResult> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey)
-    return { body: "", error: "AI is not configured. Add GEMINI_API_KEY to your environment." };
-
   if (!input.userInput.trim())
     return { body: "", error: "Please enter a prompt or draft before generating." };
-
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
   const sender = input.senderName ?? "the sender";
 
@@ -69,8 +62,7 @@ Respond with ONLY valid JSON:
 { "body": "..." }`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
+    const text = await vertexGenerateContent(prompt);
 
     const clean = text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
     const parsed = JSON.parse(clean) as { subject?: string; body: string };
